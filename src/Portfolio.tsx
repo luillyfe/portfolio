@@ -224,7 +224,7 @@ const Portfolio = () => {
                 period: "2023 - Present",
                 achievements: [
                   "Architected CV AI Coach with 40% quality improvement",
-                  "Engineered La Silla AI with 35% user growth",
+                  "Engineered Resume Intelligence with 35% user growth",
                 ],
               },
               {
