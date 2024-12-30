@@ -460,6 +460,11 @@ const Portfolio = () => {
               <div className="space-y-6">
                 {[
                   {
+                    title: "Resume Insights with LlamaIndex",
+                    platform: "Medium",
+                    link: "https://medium.com/google-cloud/resume-insights-with-llamaindex-structured-data-extraction-from-unstructured-documents-28c3ff4546a8",
+                  },
+                  {
                     title: "Advanced AI Techniques in Cloud Computing",
                     platform: "Medium",
                     link: "https://medium.com/@luillyfe",
@@ -468,6 +473,12 @@ const Portfolio = () => {
                     title: "Building Scalable ML Systems",
                     platform: "Google Cloud Publications",
                     link: "#",
+                  },
+                  {
+                    title:
+                      "Securing Customer Data in the Cloud: A Multi-Layered Approach",
+                    platform: "Medium",
+                    link: "https://medium.com/google-cloud/securing-customer-data-in-the-cloud-a-multi-layered-approach-for-bean-there-brewed-that-ffca8452bf1d",
                   },
                 ].map((publication, index) => (
                   <a
