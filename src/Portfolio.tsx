@@ -329,6 +329,38 @@ const Portfolio = () => {
                   "3% conversion rate improvement",
                 ],
               },
+              {
+                role: "Software Engineer",
+                company: "Freelance",
+                period: "DECEMBER 2016 - MAY 2021",
+                achievements: [
+                  "Developed a serverless web application for a logistics firm using AWS Lambda and API Gateway, reducing operational costs by 35% and improving scalability.",
+                  "Implemented GraphQL API with Apollo Server, decreasing frontend-backend data transfer by 40% and accelerating development cycles by 20%.",
+                  "Designed and deployed a CI/CD pipeline using Jenkins and Docker, reducing deployment errors by 60% and cutting deployment time from hours to minutes.",
+                  "Created a real-time monitoring system using WebSockets and React, improving client response times by 25% and increasing customer satisfaction scores by 15%.",
+                ],
+              },
+              {
+                role: "Software Engineer",
+                company: "UruIT",
+                period: "JUNE 2014 - NOVEMBER 2016",
+                achievements: [
+                  "Architected and implemented a modular Node.js application structure, improving code reusability by 30% and reducing development time for new features by 25%.",
+                  "Optimized ElasticSearch queries, resulting in a 50% reduction in search latency and a 40% increase in search accuracy for location-based services.",
+                  "Implemented JSON Web Token authentication, enhancing system security and reducing unauthorized access attempts by 80%.",
+                ],
+              },
+              {
+                role: "Software Engineer",
+                company: "Ceiba Software",
+                period: "DECEMBER 2014 - AUGUST 2016",
+                achievements: [
+                  "Reduced latency by 20% and increased throughput by 15% for the Risk Locator System by optimizing database queries and implementing caching strategies.",
+                  "Developed a real-time websocket system for risk sharing, improving data synchronization speed by 40% and enabling instantaneous updates across multiple clients.",
+                  "Led the implementation of Continuous Integration practices, reducing integration issues by 70% and accelerating the release cycle from bi-weekly to weekly.",
+                  "Designed and implemented a cross-team communication framework, improving project delivery times by 30% and reducing misalignments between business and development teams by 50%.",
+                ],
+              },
             ].map((experience, index) => (
               <div key={index} className="group relative">
                 <div className="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-blue-500 to-purple-500 transform scale-y-0 group-hover:scale-y-100 transition-transform origin-top" />
