@@ -8,6 +8,7 @@ import {
   Cloud,
   Cpu,
   Link,
+  Sparkles,
 } from "lucide-react";
 import debounce from "lodash/debounce";
 import gitHubIcon from "./assets/github-white.svg";
@@ -18,6 +19,8 @@ const Portfolio = () => {
   const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({});
   const [activeSection, setActiveSection] = useState("hero");
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const throttleTimeoutRef = useRef<number | null>(null);
 
   const scrollToSection = (section: string) => {
     if (sectionRefs.current[section]) {
@@ -92,6 +95,30 @@ const Portfolio = () => {
     };
   }, 100); // Adjust debounce time as needed (ms)
 
+  // Mouse parallax effect for hero section
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (throttleTimeoutRef.current) return; // Access the current value
+
+      throttleTimeoutRef.current = setTimeout(() => {
+        // Assign to current
+        setMousePosition({
+          x: (e.clientX / window.innerWidth - 0.5) * 20,
+          y: (e.clientY / window.innerHeight - 0.5) * 20,
+        });
+        throttleTimeoutRef.current = null; // Clear the timeout
+      }, 16);
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      if (throttleTimeoutRef.current) {
+        clearTimeout(throttleTimeoutRef.current); // Clear in cleanup
+      }
+    };
+  }, []);
+
   useEffect(() => {
     window.addEventListener("scroll", debouncedHandleScroll);
     return () => window.removeEventListener("scroll", debouncedHandleScroll);
@@ -99,9 +126,11 @@ const Portfolio = () => {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Progress Bar */}
+      {/* Animated background gradient */}
+      <div className="fixed inset-0 bg-gradient-to-br from-black via-blue-900/10 to-black animate-gradient-shift pointer-events-none" />
+      {/* Progress Bar with glowing effect */}
       <div
-        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 z-50 transition-all duration-300"
+        className="fixed top-0 left-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 z-50 transition-all duration-300 shadow-glow"
         style={{ width: `${scrollProgress}%` }}
       />
 
@@ -112,59 +141,93 @@ const Portfolio = () => {
             <div
               key={section}
               onClick={() => scrollToSection(section)}
-              className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 ${
-                activeSection === section
-                  ? "bg-blue-500 scale-125"
-                  : "bg-gray-500 hover:bg-gray-400"
-              }`}
-            />
+              className={`group relative w-3 h-3 rounded-full cursor-pointer transition-all duration-300 
+              ${activeSection === section ? "scale-125" : "hover:scale-110"}`}
+            >
+              <div
+                className={`absolute inset-0 rounded-full ${
+                  activeSection === section
+                    ? "bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse"
+                    : "bg-gray-500 group-hover:bg-gray-400"
+                }`}
+              />
+              <div
+                className={`absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 opacity-0 group-hover:opacity-50 blur-sm transition-opacity`}
+              />
+            </div>
           )
         )}
       </div>
 
-      {/* Hero Section */}
+      {/* Hero Section with Parallax */}
       <section
         id="hero"
         ref={(el) => (sectionRefs.current["hero"] = el)}
         className="min-h-screen flex items-center relative overflow-hidden"
+        style={{
+          perspective: "1000px",
+        }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-blue-900/20 to-black" />
         <div className="container mx-auto px-6 relative z-10">
-          <div className="flex flex-col lg:flex-row items-center lg:items-start gap-12">
+          <div
+            className="flex flex-col lg:flex-row items-center lg:items-start gap-12"
+            style={{
+              transform: `translate3d(${mousePosition.x}px, ${
+                mousePosition.y
+              }px, 0) rotateX(${mousePosition.y * 0.1}deg) rotateY(${
+                mousePosition.x * 0.1
+              }deg)`,
+              transition: "transform 0.1s ease-out",
+            }}
+          >
             {/* Profile Image */}
-            <div className="relative">
-              <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-blue-500/30 relative z-10">
+            <div className="relative group">
+              <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-blue-500/30 relative z-10 transition-transform duration-500 group-hover:scale-105">
                 <img
                   src={profile}
                   alt="Fermin Blanco"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
               </div>
-              {/* Decorative gradient circle */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-2xl opacity-20 z-0" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-2xl opacity-20 z-0 group-hover:opacity-30 transition-opacity" />
+              <Sparkles className="absolute top-0 right-0 text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
 
             {/* Content */}
             <div className="max-w-4xl text-center lg:text-left">
-              <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
+              <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-blue-400 text-transparent bg-clip-text animate-gradient">
                 Fermin Blanco
               </h1>
-              <h2 className="text-3xl mb-8 text-gray-300">
+              <h2 className="text-3xl mb-8 text-gray-300 transition-all duration-300 hover:text-blue-400">
                 AI and Cloud Engineer
               </h2>
-              <p className="text-xl text-gray-400 mb-12 max-w-2xl">
+              <p className="text-xl text-gray-400 mb-12 max-w-2xl transition-all duration-300 hover:text-gray-300">
                 Building the future with AI and Cloud technologies. 12+ years of
                 experience crafting scalable, intelligent solutions that drive
                 real business impact.
               </p>
               <div className="flex gap-6 justify-center lg:justify-start">
-                <button className="group flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-3 rounded-full hover:opacity-90 transition-all">
-                  View Projects
-                  <ArrowRight className="group-hover:translate-x-1 transition-transform" />
-                </button>
-                <button className="flex items-center gap-2 border border-gray-700 px-6 py-3 rounded-full hover:border-blue-500 transition-colors">
+                <a
+                  href="https://github.com/luillyfe"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group relative flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-3 rounded-full overflow-hidden transition-all duration-300 hover:shadow-glow"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    View Projects
+                    <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </a>
+                <a
+                  href="https://linkedin.com/in/ferminblanco"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-2 border border-gray-700 px-6 py-3 rounded-full hover:border-blue-500 transition-all duration-300 hover:shadow-glow"
+                >
                   Get in Touch
-                </button>
+                  <div className="w-1 h-1 rounded-full bg-blue-500 opacity-0 group-hover:opacity-100 animate-ping" />
+                </a>
               </div>
             </div>
           </div>
@@ -414,46 +477,54 @@ const Portfolio = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 py-12">
-        <div className="container mx-auto px-6">
+      <footer className="bg-gray-900 py-12 relative overflow-hidden">
+        <div className="container mx-auto px-6 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-center md:text-left mb-8 md:mb-0">
               <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 text-transparent bg-clip-text">
                 Let's Connect
               </h3>
-              <p className="text-gray-400 mt-2">Open to new opportunities</p>
+              <p className="text-gray-400 mt-2 hover:text-gray-300 transition-colors">
+                Open to new opportunities
+              </p>
             </div>
             <div className="flex gap-6">
-              <a
-                href="https://linkedin.com/in/ferminblanco"
-                className="text-gray-400 hover:text-blue-400 transition-colors"
-              >
-                <img
-                  src={linkedInIcon}
-                  className="w-6 h-6"
-                  width={24}
-                  height={24}
-                  alt="LinkedIn"
-                />
-              </a>
-              <a
-                href="https://github.com/luillyfe"
-                className="text-gray-400 hover:text-blue-400 transition-colors"
-              >
-                <img
-                  src={gitHubIcon}
-                  className="w-6 h-6"
-                  width={24}
-                  height={24}
-                  alt="GitHub"
-                />
-              </a>
-              <a
-                href="mailto:luillyfe89@gmail.com"
-                className="text-gray-400 hover:text-blue-400 transition-colors"
-              >
-                <Mail className="w-6 h-6" />
-              </a>
+              {[
+                {
+                  icon: linkedInIcon,
+                  href: "https://linkedin.com/in/ferminblanco",
+                  alt: "LinkedIn",
+                },
+                {
+                  icon: gitHubIcon,
+                  href: "https://github.com/luillyfe",
+                  alt: "GitHub",
+                },
+                {
+                  href: "mailto:luillyfe89@gmail.com",
+                  component: Mail,
+                  alt: "Email",
+                },
+              ].map((social, index) => (
+                <a
+                  key={index}
+                  href={social.href}
+                  className="group relative p-2 hover:scale-110 transition-all duration-300"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-0 group-hover:opacity-20 blur-md transition-opacity" />
+                  {social.component ? (
+                    <social.component className="w-6 h-6 text-gray-400 group-hover:text-blue-400 transition-colors" />
+                  ) : (
+                    <img
+                      src={social.icon}
+                      className="w-6 h-6 transition-transform group-hover:scale-110"
+                      width={24}
+                      height={24}
+                      alt={social.alt}
+                    />
+                  )}
+                </a>
+              ))}
             </div>
           </div>
         </div>
