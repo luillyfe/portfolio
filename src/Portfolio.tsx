@@ -22,7 +22,9 @@ const Portfolio = () => {
   const [activeSection, setActiveSection] = useState("hero");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const { sectionRefs, setSectionRef } = useSectionRefs<HTMLElement>();
-  const throttleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const rafRef = useRef<number>();
+  const lastMousePosition = useRef({ x: 0, y: 0 });
   const parallaxMultiplier = 20;
 
   const sections = ["hero", "projects", "experience", "skills", "publications"];
@@ -39,23 +41,31 @@ const Portfolio = () => {
   // Mouse parallax effect for hero section
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (throttleTimeoutRef.current) return; // Access the current value
+      lastMousePosition.current = {
+        x: e.clientX,
+        y: e.clientY,
+      };
 
-      throttleTimeoutRef.current = setTimeout(() => {
-        // Assign to current
-        setMousePosition({
-          x: (e.clientX / window.innerWidth - 0.5) * parallaxMultiplier,
-          y: (e.clientY / window.innerHeight - 0.5) * parallaxMultiplier,
+      if (!rafRef.current) {
+        rafRef.current = requestAnimationFrame(() => {
+          setMousePosition({
+            x:
+              (lastMousePosition.current.x / window.innerWidth - 0.5) *
+              parallaxMultiplier,
+            y:
+              (lastMousePosition.current.y / window.innerHeight - 0.5) *
+              parallaxMultiplier,
+          });
+          rafRef.current = undefined;
         });
-        throttleTimeoutRef.current = null; // Clear the timeout
-      }, 16);
+      }
     };
 
     window.addEventListener("mousemove", handleMouseMove);
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      if (throttleTimeoutRef.current) {
-        clearTimeout(throttleTimeoutRef.current); // Clear in cleanup
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
       }
     };
   }, []);
