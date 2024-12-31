@@ -13,6 +13,13 @@ A modern, responsive developer portfolio built with React, TypeScript, and Tailw
 - **Section Navigation** - Quick jump to different sections with dot navigation
 - **Performance Optimized** - Debounced scroll handling and optimized animations
 
+- **Clear Structure**: The code is well-organized with separate components for each section, making it maintainable.
+- **Smooth Scrolling**: The scrollIntoView({ behavior: "smooth" }) provides a good user experience.
+- **Active Section Highlighting**: The activeSection state and related logic correctly highlight the current section in the navigation.
+- **Parallax Effect**: The mouse parallax effect on the hero section adds a nice visual touch.
+- **Throttling**: The use of setTimeout and throttleTimeoutRef prevents excessive updates on mouse move, improving performance.
+- **Cleanup**: The useEffect includes proper cleanup for event listeners and timeouts, preventing memory leaks.
+
 ## 🚀 Tech Stack
 
 - React 18+
