@@ -16,23 +16,28 @@ export const Navigation: FC<NavigationProps> = ({
 }) => {
   const [scrollProgress, setScrollProgress] = useState(0);
 
-  const debouncedHandleScroll = debounce(() => {
+  // Scroll progress calculation
+  const handleScroll = debounce(() => {
     const totalScroll =
       document.documentElement.scrollHeight - window.innerHeight;
-    const currentProgress = Math.min((window.scrollY / totalScroll) * 100, 100); // Enforce limit of 0-100
+    const currentProgress = Math.min((window.scrollY / totalScroll) * 100, 100);
     setScrollProgress(currentProgress);
+  }, 100);
 
-    // Update active section using IntersectionObserver
+  // IntersectionObserver setup
+  useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        const newActiveSection = entries.find((entry) => entry.isIntersecting);
-        if (newActiveSection && newActiveSection.target.id) {
-          setActiveSection(newActiveSection.target.id);
-        }
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.target.id) {
+            setActiveSection(entry.target.id);
+          }
+        });
       },
       {
         root: null, // Use viewport as root
         rootMargin: "-100px 0px 0px 0px", // Triggering the callback when the bottom of the current section enters the viewport
+        threshold: 0.3,
       }
     );
 
@@ -44,15 +49,17 @@ export const Navigation: FC<NavigationProps> = ({
     });
 
     // Cleanup observer on unmount
-    return () => {
-      observer.disconnect();
-    };
-  }, 100); // Adjust debounce time as needed (ms)
+    return () => observer.disconnect();
+  }, [sections, setActiveSection]);
 
+  // Scroll event listener
   useEffect(() => {
-    window.addEventListener("scroll", debouncedHandleScroll);
-    return () => window.removeEventListener("scroll", debouncedHandleScroll);
-  }, [debouncedHandleScroll]);
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      handleScroll.cancel(); // Cancel any pending debounced calls
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [handleScroll]);
 
   return (
     <>
